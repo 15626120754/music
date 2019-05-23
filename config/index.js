@@ -19,8 +19,16 @@ module.exports = {
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
-
-    
+    //解决跨域
+    proxyTable: {
+      '/api_config': {
+        target: 'http://www.youaimusic.com',
+        changeOrigin:true,
+        pathRewrite:{
+          '/api_config':''
+        }
+      }
+    },
     /**
      * Source Maps
      */
