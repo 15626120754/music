@@ -6,21 +6,21 @@
     </transition>
     <div class="creative-search">
         <div class="search-input clearfix">
-          <input type="text" name="" placeholder="专辑、歌曲名、演唱者、歌词" class="sprites-cion">
-          <button class="search btn">搜索</button>
+          <input type="text" name="" placeholder="专辑、歌曲名、演唱者、歌词" class="sprites-cion" v-model="search">
+          <button class="search btn" @click="searchBtn">搜索</button>
         </div>
     </div>
     <div class="container">
       <div class="description clearfix">
         <div class="des-left">
           <div class="items" @mouseenter="enter()" @mouseleave="leave()">
-            <p>{{styleData}}<span class="sprites-cion"></span></p>
+            <p>{{styleName}}<span class="sprites-cion"></span></p>
           </div>
           <div class="items" @mouseenter="moodHover()" @mouseleave="moodLeave()">
-            <p>{{moodData}}<span class="sprites-cion"></span></p>
+            <p>{{moodName}}<span class="sprites-cion"></span></p>
           </div>
           <div class="items" @mouseenter="isMusicHover()" @mouseleave="isMusicLeave()">
-            <p>{{inStrumentData}}<span class="sprites-cion"></span></p>
+            <p>{{instrumentName}}<span class="sprites-cion"></span></p>
           </div>
         </div>
         <!-- <div class="des-right">
@@ -29,51 +29,57 @@
         </div> -->
         <div class="ms-list-bxo" v-loading="loading">
           <ul class="clearfix" v-show="isShow" @mouseenter="enter()" @mouseleave="leave()">
-            <li v-for="item of classifyData.mStyleList" :key="item.id" :data-styleName="item.name" @click="isStyle">{{item.name}}</li>
+            <li v-for="item of classifyData.mStyleList" :key="item.id" :data-styleName="item.name" :data-styleId="item.id" @click="isStyle">{{item.name}}</li>
           </ul>
           <ul class="clearfix" v-show="isMood" @mouseenter="moodHover()" @mouseleave="moodLeave()">
-            <li v-for="item of classifyData.languagesList" :key="item.id" :data-moodName="item.name" @click="isLanguages">{{item.name}}</li>
+            <li v-for="item of classifyData.languagesList" :key="item.id" :data-moodName="item.name" :data-moodId="item.id" @click="isLanguages">{{item.name}}</li>
           </ul>
           <ul class="clearfix" v-show="isMusic" @mouseenter="isMusicHover()" @mouseleave="isMusicLeave()">
-            <li v-for="item of classifyData.mInstrumentList" :key="item.id" :data-instrumentsName="item.name" @click="inStrument">{{item.name}}</li>
+            <li v-for="item of classifyData.mInstrumentList" :key="item.id" :data-instrumentName="item.name" :data-instrumentId="item.id" @click="inStrument">{{item.name}}</li>
           </ul>
         </div>
       </div>
       <div class="music-list">
         <div class="list-items newest" :class="{active:showFlag == 1}">
           <ul>
-            <li v-for="item in searchMusicData.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize)">
+            <li v-for="(item,index) of searchMusicData.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize)">
               <div class="music-audio clearfix">
                 <div class="left">
-                  <div class="head" :key="item.id" @click="audioPlay(item.url)">
-                    <img class="j-img" src="http://p2.music.126.net/p9U80ex1B1ciPFa125xV5A==/5931865232210340.jpg?param=62y62">
+                  <div class="head" :key="item.id" @click="audioPlay(item.url,item.id)">
+                    <img class="j-img" :src="item.coverImage">
+                    <div class="play-button-wrapper">
+                      <div class="music-play-button">
+                        <!-- <i class="spritesList-icon pause-icon" :class="activePlayItem(item)"></i> -->
+                        <i class="spritesList-icon pause-icon" :class="activePlayItem(item)"></i>
+                      </div>
+                    </div>
                   </div>
                   <div class="ifo">
                     <h4>{{item.name}}</h4>
                     <p class="f-thide">{{item.singer}}</p>
-                    <p class="s-fc3">{{item.albumName}}</p>
+                    <!-- <p class="s-fc3">{{item.albumName}}</p> -->
                   </div>
                 </div>
                 <div class="right">
-                  <p>02:58</p>
+                  <p>{{formatTime(item.duration)}}</p>
                   <img src="../../assets/images/cart.png" class="cart" :data-cart="item.id">
-                  <img src="../../assets/images/collection.png" class="collection" :data-collect="item.id" @click="collect">
+                  <img src="../../assets/images/unSelected.png" class="collection" :data-collect="item.id" @click="collect">
                 </div>
               </div>
             </li>
           </ul>
           <div class="pagination-box">
-             <el-pagination
+            <el-pagination
                background
                layout="prev, pager, next"
                :total="searchMusicData.length"
                 @current-change="handleCurrentChange"
                 :current-page="currentPage"
                 :page-size="pageSize">
-          </el-pagination>
+            </el-pagination>
           </div>
         </div>
-        <<!-- div class="list-items hottest":class="{active:showFlag == 2}">
+        <!-- <div class="list-items hottest":class="{active:showFlag == 2}">
           2
         </div> -->
       </div>
@@ -104,11 +110,16 @@ export default {
       loading: true,  //加载icon
       searchMusicData:[], //音乐搜索
       currentPage:1,//分页
-      pageSize:2,//分页数
-      styleData:'风格',
-      moodData:'语言',
-      inStrumentData:'乐器',
-      audioChild:''
+      pageSize:8,//分页数
+      styleData:'',
+      moodData:'',
+      inStrumentData:'',
+      audioChild:'',
+      currentSongId:null,
+      search:null,
+      styleName:'风格',
+      moodName:'语言',
+      instrumentName:'乐器'
     }
   },
   methods:{
@@ -156,13 +167,27 @@ export default {
       })
     },
     //音乐搜索
-    searchMusic:function(styleData,moodData,inStrumentData){
+    searchMusic:function(){
       this.$http.get('/api_config/api/music/searchMusic',{
         params:{
           keyword:'',
-          styleId:styleData,
-          languagesId:moodData,
-          instrumentId:inStrumentData
+          styleId:this.styleData,
+          languagesId:this.moodData,
+          instrumentId:this.inStrumentData
+        }
+      }).then((response) => {
+        this.searchMusicData = response.data.data
+      },(response) => {
+        console.log(response)
+      })
+    },
+    searchBtn(){
+      this.$http.get('/api_config/api/music/searchMusic',{
+        params:{
+          keyword:this.search,
+          styleId:'',
+          languagesId:'',
+          instrumentId:''
         }
       }).then((response) => {
         this.searchMusicData = response.data.data
@@ -172,7 +197,19 @@ export default {
     },
     //收藏
     collect:function(e){
-      console.log(e.srcElement.dataset.collect)
+      // console.log(e.srcElement.dataset.collect)
+      // console.log('userId:'+sessionStorage.getItem("userId"));
+      this.$http.post('/api_config/api/collet/add',{
+        userId:sessionStorage.getItem("userId"),
+        keyId:e.srcElement.dataset.collect,
+        type:1
+      },{
+        emulateJSON: true
+      }).then((response) => {
+        console.log(response)
+      },(response) => {
+        console.log(response)
+      })
     },
     //分页
     handleCurrentChange(val){
@@ -180,24 +217,46 @@ export default {
     },
     //风格
     isStyle:function(e){
-      let name = e.currentTarget.dataset.stylename;
-      this.styleData = name;
-      this.searchMusic(this.styleData)
+      let styleId = e.currentTarget.dataset.styleid;
+      this.styleData = styleId;
+      let styleName = e.currentTarget.dataset.stylename
+      this.styleName = styleName;
+      this.searchMusic()
     },
     //语言
     isLanguages:function(e){
-      let name = e.currentTarget.dataset.moodname;
-      this.moodData = name;
+      let moodId = e.currentTarget.dataset.moodid;
+      this.moodData = moodId;
+      let moodName = e.currentTarget.dataset.moodname;
+      this.moodName = moodName;
+      this.searchMusic()
     },
     //乐器
     inStrument:function(e){
-      let name = e.currentTarget.dataset.instrumentsname;
-      this.inStrumentData = name;
+      let instrumentId = e.currentTarget.dataset.instrumentid;
+      this.inStrumentData = instrumentId;
+      let instrumentName = e.currentTarget.dataset.instrumentname;
+      this.instrumentName = instrumentName;
+      this.searchMusic()
     },
     //播放
-    audioPlay:function(url){
+    audioPlay:function(url,id){
       this.audioChild = url;
-    }
+      this.currentSongId = id;
+    },
+    activePlayItem:function(item,index){
+      if (this.currentSongId === item.id) { // 当前播放是选中的歌曲
+        return 'start-icon';
+      }else{
+        return 'pause-icon';
+      }
+    },
+    formatTime(time){
+      let it = parseInt(time)
+      let m = parseInt(it/60)
+      let s = parseInt(it%60)
+      return (m<10?"0":"")+parseInt(it/60)+":"+(s<10?"0":"")+parseInt(it%60)
+    },
   },
   mounted() {
     this.classify();
@@ -207,10 +266,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.pagination-box >>> .el-pagination.is-background .el-pager li:not(.disabled).active
+  background-color: #C80110;
 .fade-enter-active, .fade-leave-active
-    transition: opacity .5s
+  transition: opacity .5s
 .fade-enter, .fade-leave-active
   opacity: 0
+.spritesList-icon
+  background: url(../../assets/images/sprites-cion.png) no-repeat 0 9999px
 .sprites-cion
   background:url('../../assets/images/sprites-cion.png') center no-repeat
 .creative-search
@@ -329,25 +392,65 @@ export default {
   border:1px solid #e8e8e8
   border-radius:4px
   margin-bottom:15px
-  .music-audio
-    padding:14px 19px
-    box-sizing: border-box
   .music-audio .left
     float:left
+    margin-top: 20px
+    margin-left: 20px
   .music-audio .left .head
-    width:90px
-    height:90px
+    width:60px
+    height:60px
     float:left
     margin-right:23px
+    position:relative
+    border-radius:3px
+    overflow:hidden
   .music-audio .left .head img
-    width:90px
-    height:90px
+    width:60px
+    height:60px
+  .music-audio .left .head .play-button-wrapper .music-play-button
+    position: absolute
+    top: 0
+    left: 50%
+    display: -webkit-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-transform: translateX(-50%)
+    transform: translateX(-50%)
+    -webkit-box-pack: center
+    -ms-flex-pack: center
+    justify-content: center
+    -webkit-box-align: center
+    -ms-flex-align: center
+    align-items: center
+    width: 60px
+    height: 60px
+    -webkit-transition: all .6s
+    transition: all .6s
+    background-color: rgba(0,0,0,.4)
+  .music-audio .left .head .play-button-wrapper .music-play-button:hover
+    background-color:rgba(0,0,0,.1)
+  .music-audio .left .head .play-button-wrapper .music-play-button .pause-icon
+    width:30px
+    height:30px
+    display:block
+    background-position: -4px -144px
+    margin-top: 10px
+    margin-left: 12px
+    cursor: pointer
+  .music-audio .left .head .play-button-wrapper .music-play-button .start-icon
+    width:30px
+    height:30px
+    display:block
+    background-position: -5px -113px;
+    margin-top: 16px;
+    margin-left: 12px
+    cursor: pointer
   .music-audio .left .ifo
     float:left
   .music-audio .left .ifo h4
     font-weight:bold
     font-size:18px
-    margin-bottom:21px
+    margin-bottom:12px
     margin-top:8px
   .music-audio .left .ifo p
     font-size:12px
@@ -355,14 +458,16 @@ export default {
     margin-bottom:4px
   .music-audio .right
     float: right
-    height: 90px
-    line-height: 90px
+    height: 100px
+    line-height: 100px
   .music-audio .right p
     float:left
     margin-right:47px
+    font-size:14px
   .music-audio .right img
-    width:36px
-    height:36px
+    width:20px
+    height:20px
+    cursor: pointer
   .music-audio .right img.collection
     margin-left:24px
     margin-right:28px

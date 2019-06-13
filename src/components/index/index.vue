@@ -53,7 +53,7 @@
                 <p>
                   词曲作品录音制作授权，是指录音制作者对其录制的录音制品依法享有的一种独占性权利，属于著作邻接权。 被授权人有权使用被授权的词曲作品的相关著作权利(复制、发行、通过信息网络向公众传播录音录像制品)。
                 </p>
-                <a href="#" class="come-mall">进入音乐商城</a>
+                <a href="#" class="come-mall">进入音乐商城<i class="el-icon-d-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -146,7 +146,6 @@
           </div>
         </div>
       </div>
-
       <div class="list music-bgColor">
         <div class="content">
           <div class="version">
@@ -156,41 +155,8 @@
             </div>
             <div class="enterprise">
               <ul class="about-partner-box clearfix">
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
-                </li>
-                <li>
-                  <!-- <img src="../../assets/images/partner1.e575f1ab67095c551f62aa1ac5e29752.png"> -->
+                <li v-for="item of cooperativeData" :key="item.id">
+                  <img :src="item.url">
                 </li>
               </ul>
             </div>
@@ -220,7 +186,6 @@ export default {
 	      el: '.swiper-pagination',
 	      clickable:true
 	    },
-        loop: true,
         spaceBetween: 100,
         effect: 'fade',
         autoplay: {
@@ -229,23 +194,33 @@ export default {
     	　　}
       },
       carouselData:[],
+      cooperativeData:[],
       audioShow:false
     }
   },
   methods: {
+    //轮播
     carousel() {
-        this.$http.get('/api_config/api/advertisement/getList').then((response) => {
-          this.carouselData = response.data.data
-        },(response) => {
-          console.log(response)
-        })
+      this.$http.get('/api_config/api/advertisement/getList').then((response) => {
+        this.carouselData = response.data.data
+      },(response) => {
+        console.log(response)
+      })
     },
     listenAudioChild:function(data){
       this.audioShow = data
+    },
+    cooperative() {
+      this.$http.get('/api_config/api/partners/findList',{'limit':20}).then((response) => {
+        this.cooperativeData = response.data.data
+      },(response) => {
+        console.log(response)
+      })
     }
   },
   mounted() {
-      this.carousel();
+    this.carousel();
+    this.cooperative();
   }
 }
 </script>
@@ -294,7 +269,7 @@ export default {
     .version .version-title .ver-borderBottom
       width:65px
       height:0
-      border-bottom:4px solid #bc1b21
+      border-bottom:4px solid #C80110
       display:block
       margin:0 auto
     .version .music-person
@@ -385,7 +360,7 @@ export default {
       top:2px
       width:4px
       height:25px
-      background:#bc1b21
+      background:#C80110
     .transcribe-box .wxt-right p
       margin-bottom:10px
       line-height:20px
@@ -394,7 +369,7 @@ export default {
     .transcribe-box .wxt-right .come-mall
       width:178px
       height:33px
-      line-height:33px
+      line-height:30px
       display:block
       border:1px solid #797979
       padding-left:27px
@@ -406,13 +381,11 @@ export default {
       right:64px
       bottom:30px
     .transcribe-box .wxt-right .come-mall:hover
-      background:#bc1b21
+      background:#C80110
       color:#fff
       border:1px solid #bc1b21
-    .transcribe-box .wxt-right .come-mall::after
-      position:absolute
-      right:20px
-      content:'>>'
+    .transcribe-box .wxt-right .come-mall i
+      margin-left:20px
     .music-person
       padding-top:69px
       box-sizing:border-box
@@ -438,10 +411,33 @@ export default {
       display:block
       padding:8px
       box-sizing:border-box
+      .top-img
+        overflow:hidden
       .top-img img
-        width:100%
+        width:309px
+        height:201px
         object-fit:cover
         overflow:hidden
+        top: 0
+        position: relative
+        left: 0
+        -webkit-transform: scale(1.1)
+        -moz-transform: scale(1.1)
+        -ms-transform: scale(1.1)
+        -o-transform: scale(1.1)
+        transform: scale(1.1)
+        transition: transform 0.3s, opacity 0.3s
+        -moz-transition: -moz-transform 0.3s
+        -o-transition: -o-transform 0.3s
+      .top-img img:hover
+        -webkit-transform: scale(1)
+        -moz-transform: scale(1)
+        -ms-transform: scale(1)
+        -o-transform: scale(1)
+        transform: scale(1)
+        transition: all 0.4s
+        -moz-transition: all 0.4s
+        -o-transition: all 0.4s
       .bottom-text h2
         width:100%
         height:69px
@@ -458,7 +454,7 @@ export default {
         top:22px
         width:4px
         height:25px
-        background:#bc1b21  
+        background:#C80110  
       .bottom-text p
         font-size:14px
         color#333
@@ -496,6 +492,7 @@ export default {
       float:left
       margin: 0 73px 32px 0
       background:#fff
+      overflow:hidden
     .enterprise .about-partner-box li:nth-child(4n)
       margin-right:0
     .enterprise .about-partner-box li img

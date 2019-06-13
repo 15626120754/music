@@ -20,7 +20,7 @@
           <div class="player-slider" style="height: 10px;margin-top: -12px">
             <el-slider @change="changeTime" :format-tooltip="formatTime" :max="music.maxTime" v-model="music.currentTime" style="width: 100%;"></el-slider>
           </div>
-          <div class="player-message">播放列表是空的</div>
+          <!-- <div class="player-message">播放列表是空的</div> -->
         </div>
         <div class="player-control">
           <!-- <div title="上一首" class="player-control-btn">
@@ -59,7 +59,8 @@
 export default {
   name: 'IndexAudio',
   props:{
-    music_audio:String
+    music_audio:String,
+    music_name:String
   },
   data () {
     return {
@@ -74,7 +75,7 @@ export default {
       isFlag:false//音量
     }
   },
-   methods:{
+  methods:{
     listenMusic(){
       if(!this.$refs.music){
         return
@@ -118,6 +119,14 @@ export default {
       setInterval(this.listenMusic,1000)
     })
   },
+  watch:{
+    //监听音乐列表点击获取到props，把props中的music_audio当成一个方法，触发播发器play()的方法
+    music_audio(){
+      this.$nextTick(()=>{
+        this.play();
+      })
+    }
+  }
 }
 </script>
 

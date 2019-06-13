@@ -8,39 +8,43 @@
 	  	</router-link>
 	  	<ul class="m-nav">
 	  		<li>
-	  			<router-link to="/music-mall" tag="a" active-class="active">	
+	  			<router-link to="/music-mall" tag="a" class="header-router" active-class="active">	
 	  				音乐商城
 	  			</router-link>
 	  		</li>
 	  		<li>
-	  			<a href="#">我的音乐</a>	`
+	  			<a href="#" class="header-router">我的音乐</a>
 	  		</li>
 	  		<li>
-	  			<a href="#">音乐人</a>
+	  			<a href="#" class="header-router">音乐人</a>
+	  		</li>
+	  		<li  @mouseenter="issueHover()" @mouseleave="issueLeave()">
+	  			<a href="#" class="header-router">制作发行</a>
+	  			<transition name="fade">
+		  			<div class="issue" v-show="isHover">
+		  				<div class="listDiv">
+		  					<a href="#">MV制作</a>
+		  				</div>
+		  				<div class="listDiv"><router-link to="/ktv-entry" tag="a" active-class="cur">KTV入驻</router-link></div>
+		  				<div class="listDiv"><a href="#">数字发行</a></div>
+		  			</div>
+	  			</transition>
 	  		</li>
 	  		<li>
-	  			<a href="#">制作发行</a>
-	  			<!-- <ul>
-	  				<li><a href="#">1</a></li>
-	  				<li><a href="#">1</a></li>
-	  				<li><a href="#">1</a></li>
-	  			</ul> -->
+	  			<a href="#" class="header-router">版权登记</a>
 	  		</li>
 	  		<li>
-	  			<a href="#">版权登记</a>
-	  		</li>
-	  		<li>
-	  			<a href="#">授权查询</a>
+	  			<a href="#" class="header-router">授权查询</a>
 	  		</li>
 	  	</ul>
 	  	<div class="header-nav">
 	  		<div class="item sprites-icon mc-item" v-on:click="audioToggle"></div>
-	  		<div class="item sprites-icon msg-item"></div>
-	  		<div class="item sprites-icon user-item" @click="userLogin"></div>
-	  		<div class="item logged-item">
+	  		<div class="item sprites-icon msg-item" v-show="isLogin"></div>
+	  		<div class="item sprites-icon user-item" @click="userLogin" v-show="!isLogin"></div>
+	  		<div class="item logged-item" v-show="isLogin">
 	  			<div class="user-login" @mouseenter="enter()" @mouseleave="leave()">
 			  		<a href="javascript:;" class="user-icon">
-			  			<img src="../../assets/images/13085f7ec5.jpg">
+			  			<img src="../../assets/images/21313.jpg">
 			  		</a>
 			  		<transition name="fade">
 				  		<div class="m-tlist" v-show="isShow">
@@ -69,8 +73,8 @@
 					  					<em>我的消息</em>
 					  				</a>
 					  			</li>
-					  			<li>
-					  				<a href="#">
+					  			<li @click="loginOut()">
+					  				<a href="javascipt:;">
 					  					<i class="ql-icon-i sprites-icon"></i>
 					  					<em>退出登录</em>
 					  				</a>
@@ -82,35 +86,24 @@
 	  		</div>
 	  	</div>
   	</div>
-	<el-dialog 
-	    title="登录"
-	    :visible.sync="dialogFormVisible" :modal-append-to-body='false'>
-	        <el-form>
-	            <el-form-item>
-	            	<el-input placeholder="手机号码/邮箱"></el-input>
-	            </el-form-item>
-	            <el-form-item>
-	                <el-input placeholder="密码"></el-input>
-	            </el-form-item>
-	            <router-link to="/register">
-		            <span class="register">新用户注册</span>
-		        </router-link>
-	        </el-form>
-	        <div slot="footer" class="dialog-footer">
-	            <el-button type="danger" @click="dialogFormVisible = false">登录</el-button>
-	        </div>
-	</el-dialog>
+	<Login></Login>
   </div>
 </template>
-
 <script>
+import Transfer from '../../transferJs/transfer.js'
+import Login from '../login/login'
 export default {
   name: 'IndexHeader',
+  components:{
+  	Login
+  },
   data () {
   	return {
   		isShow:false,
+  		isHover:false,
   		audioShow:false,
-  		dialogFormVisible:false,
+  		dialogFlag:false,
+  		dialogFormVisible:false
   	}
   },
   methods: {
@@ -120,23 +113,60 @@ export default {
   	leave(index) {
   		this.isShow = false;
   	},
+  	issueHover() {
+  		this.isHover = true;
+  	},
+  	issueLeave() {
+  		this.isHover = false;
+  	},
   	audioToggle:function(){
   		this.audioShow = !this.audioShow;
   		this.$emit('listenToChildEvent', this.audioShow);
   	},
-  	//用户登录
+  	//用户登录弹窗
   	userLogin(){
-  		this.dialogFormVisible = true;
+  		// this.dialogFormVisible = true
+  		this.dialogFlag = true;
+  		Transfer.$emit('dialogEvent', this.dialogFlag);
+  	},
+  	//退出登录
+  	loginOut(){
+	    this.$confirm('您确认退出登录吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        }).then(() => {
+	  		this.$http.get('/api_config/api/logout').then((response) => {
+        		sessionStorage.clear();//清除sessionStorage
+                this.$message({type: 'success',message: '退出成功'});
+                this.$store.dispatch('setUser',null);
+		    },(response) => {
+		        console.log(response)
+		    })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
   	}
+  },
+  computed:{
+	isLogin(){
+	  //通过sessionStorage获取vuex里isLogin的状态
+	  if (sessionStorage.getItem("userName") && sessionStorage.getItem("userId")) {
+	    this.$store.commit("userStatus",sessionStorage.getItem("userName"));
+	  }else{
+	    this.$store.commit("userStatus",null);
+	  }
+	  return this.$store.getters.isLogin;
+	}
   }
 }
 </script>
 
 <style lang="stylus" scoped>
-.el-dialog__wrapper >>> .el-dialog
-  width:405px
-.dialog-footer >>> .el-button
-  width:100%
 .sprites-icon
   background: url(../../assets/images/sprites.png) no-repeat 0 9999px
 .header
@@ -163,15 +193,32 @@ export default {
   	 	float:left
   	 	height:60px
   	 	font-size:14px
-  	 .m-nav li a
+  	 	position:relative
+  	 .m-nav li a.header-router
   	    padding:0 19px
   	    text-align:center
   	    height:60px
   	    line-height:60px
   	    color:#333
   	    display:block
-  	 .m-nav li a.active,.m-nav li a:hover
+  	 .m-nav li a.header-router.active,.issue .listDiv a.cur,.m-nav li a.header-router:hover
 	    color: #C20C0C
+	 .issue
+	 	width:100%
+	 	position:absolute
+	 	border:1px solid #e5e5e5
+	 	background:#fff
+	 .issue .listDiv
+	 	height:40px
+	 .issue .listDiv a
+	 	width:100%
+	 	height:40px
+	 	line-height:40px
+	 	display:block
+	 	text-align:center
+	 	color:#333
+	 .issue .listDiv a:hover
+	 	background:#f2f2f2
 	.header-nav
 	  height:48px
 	  float:right
@@ -191,7 +238,6 @@ export default {
       background-position:-43px -108px
     .logged-item
       margin-top:-4px
-      display:none
 	.logged-item .user-login a.user-icon img
 	   width:30px
 	   height:30px
@@ -252,8 +298,5 @@ export default {
 	  transition: opacity .25s;
 	.fade-enter, .fade-leave-to
 	  opacity: 0;
-  .register
-  	display:block
-  	text-align:right
-  	color:#ff6e52	
+  
 </style>

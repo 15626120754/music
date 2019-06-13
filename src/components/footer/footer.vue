@@ -53,7 +53,7 @@ export default {
 .footer
   width:100%
   height:213px
-  background:#2a364b
+  background:#2f2f2f
   .footer-inner
   	width:1200px
   	color:#fff
@@ -62,7 +62,7 @@ export default {
   	box-sizing:border-box
   	.footer-text
   	  padding-bottom:39px
-  	  border-bottom:1px solid #fff
+  	  border-bottom:1px solid #505050
   	.footer-text .footer-left
   	  margin-top:52px
   	.footer-text .footer-center,.footer-text .footer-right
@@ -71,12 +71,12 @@ export default {
   	  width:33.33%
   	  float:left
   	.footer-left p.title
-  	  color:#bc1b22
-  	  font-size:40px
+  	  color:#d5d5d5
+  	  font-size:30px
   	  margin-bottom:19px
   	.footer-left p.ms-love
-  	  color:#fff
-  	  font-size:20px
+  	  color:#d5d5d5
+  	  font-size:18px
   	.footer-center
   	  padding-left:78px
   	  box-sizing:border-box
@@ -84,7 +84,7 @@ export default {
   	  padding-left:83px
   	  box-sizing:border-box
   	.footer-center p.top001,.footer-right .right-pr
-  	  color:#bc1b22
+  	  color:#d5d5d5
   	  font-size:20px
   	  margin-bottom:10px
   	.footer-center .fc-div p
@@ -92,6 +92,7 @@ export default {
   	.footer-center .fc-div p.first-p0
       padding-right:10px
       position:relative
+      color:#d5d5d5
     .footer-center .fc-div p.first-p0:after
       content:''
       width:1px
@@ -101,6 +102,7 @@ export default {
       right:0
     .footer-center .fc-div p.second-p0
       padding-left:10px
+      color:#d5d5d5
     .footer-right ul li
       float:left
       padding-right:10px
@@ -121,9 +123,10 @@ export default {
     .footer-right ul li:last-child:after
       width:0
     .footer-right ul li a
-      color:#fff
+      color:#d5d5d5
   .put-file
     width:100%
     line-height:44px
     text-align:center
+    color:#d5d5d5
 </style>
