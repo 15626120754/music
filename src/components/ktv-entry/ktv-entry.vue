@@ -7,7 +7,7 @@
     <div class="banner">
     	<h3>有爱音乐（KTV入驻）</h3>
     	<p>入驻全国各地KTV，让你的音乐场遍全国每个角落</p>
-    	<router-link to="/make-manage" tag="a">立 即 入 驻</router-link>
+    	<a href="javascript:;" @click="isLoginLink">立 即 入 驻</a>
     </div>
     <div class="enter-introduce curs-active">
     	<div class="enter-inner">
@@ -32,14 +32,13 @@
     			<img src="../../assets/images/liuanchengimg.png">
     		</div>
     		<div class="enBoxs">
-    			<router-link to="/make-manage" tag="a" class="entr-a78">立 即 入 驻</router-link>
+    			<a href="javascript:;" class="entr-a78" @click="isLoginLink">立 即 入 驻</a>
     		</div>
     	</div>
     </div>
     <index-footer></index-footer>
   </div>
 </template>
-
 <script>
 import IndexHeader from '../header/header'
 import IndexFooter from '../footer/footer'
@@ -59,6 +58,16 @@ export default {
   methods:{
     listenAudioChild:function(data){
       this.audioShow = data
+    },
+    isLoginLink:function(data){
+      if (!sessionStorage.getItem("userId")) {
+        this.$message({
+          message: '您需要先登录',
+          type: 'warning'
+        });
+      }else{
+        this.$router.push({path:'/make-manage'});
+      }
     }
   }
 }

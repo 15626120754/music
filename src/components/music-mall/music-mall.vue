@@ -2,7 +2,7 @@
   <div>
   	<index-header v-on:listenToChildEvent="listenAudioChild"></index-header>	
     <transition name="fade">
-      <index-audio v-show="audioShow" :music_audio="audioChild"></index-audio>   
+      <index-audio v-show="audioShow" :music_audio="audioChild" :music_name="albumName" :mySinger="singer" :myCoverImage="coverImage"></index-audio>   
     </transition>
     <div class="creative-search">
         <div class="search-input clearfix">
@@ -45,12 +45,12 @@
             <li v-for="(item,index) of searchMusicData.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize)">
               <div class="music-audio clearfix">
                 <div class="left">
-                  <div class="head" :key="item.id" @click="audioPlay(item.url,item.id)">
-                    <img class="j-img" :src="item.coverImage">
+                  <div class="head" :key="item.id" @click="audioPlay(item.url,item.id,item.name,item.singer,item.coverImage)">
+                    <img class="j-img" v-lazy="item.coverImage">
                     <div class="play-button-wrapper">
                       <div class="music-play-button">
                         <!-- <i class="spritesList-icon pause-icon" :class="activePlayItem(item)"></i> -->
-                        <i class="spritesList-icon pause-icon" :class="activePlayItem(item)"></i>
+                        <i class="spritesList-icon pause-icon"  @click="activePlayItem(index,$event)" :class="index==current? 'start-icon':'pause-icon'"></i>
                       </div>
                     </div>
                   </div>
@@ -63,7 +63,8 @@
                 <div class="right">
                   <p>{{formatTime(item.duration)}}</p>
                   <img src="../../assets/images/cart.png" class="cart" :data-cart="item.id">
-                  <img src="../../assets/images/unSelected.png" class="collection" :data-collect="item.id" @click="collect">
+                  <img src="../../assets/images/unSelected.png" class="collection" :data-collect="item.id" @click="unSelectedTap" v-if="item.isCollet === 0">
+                  <img src="../../assets/images/selected.png" class="collection" :data-collect="item.id" @click="selectedTap" v-if="item.isCollet === 1">
                 </div>
               </div>
             </li>
@@ -115,11 +116,15 @@ export default {
       moodData:'',
       inStrumentData:'',
       audioChild:'',
+      albumName:'',
+      singer:'',
+      coverImage:'',
       currentSongId:null,
       search:null,
       styleName:'风格',
       moodName:'语言',
-      instrumentName:'乐器'
+      instrumentName:'乐器',
+      current:null
     }
   },
   methods:{
@@ -195,18 +200,47 @@ export default {
         console.log(response)
       })
     },
-    //收藏
-    collect:function(e){
-      // console.log(e.srcElement.dataset.collect)
-      // console.log('userId:'+sessionStorage.getItem("userId"));
+    //add收藏
+    unSelectedTap:function(e){
       this.$http.post('/api_config/api/collet/add',{
-        userId:sessionStorage.getItem("userId"),
+        keyId:e.srcElement.dataset.collect,
+        type:1
+      },{
+        emulateJSON: true
+      }).then((response) => {
+        if (response.data.code == -10001) {
+          this.$message.error(response.data.msg);
+          return false;
+        }else{
+          this.$message({
+            message: '收藏成功',
+            type: 'success'
+          });
+          this.searchMusic();
+        }
+      },(response) => {
+        console.log(response)
+      })
+    },
+    //取消收藏
+    selectedTap:function(e){
+      this.$http.post('/api_config/api/collet/del',{
         keyId:e.srcElement.dataset.collect,
         type:1
       },{
         emulateJSON: true
       }).then((response) => {
         console.log(response)
+        if (response.data.code == 1) {
+          this.$message({
+            message: '已取消收藏',
+            type: 'success'
+          });
+          this.searchMusic();
+        }else{
+          this.$message.error(response.data.msg);
+          return false;
+        }
       },(response) => {
         console.log(response)
       })
@@ -240,16 +274,22 @@ export default {
       this.searchMusic()
     },
     //播放
-    audioPlay:function(url,id){
+    audioPlay:function(url,id,name,singer,coverImage){
       this.audioChild = url;
       this.currentSongId = id;
+      this.albumName = name;
+      this.singer = singer;
+      this.coverImage = coverImage
     },
-    activePlayItem:function(item,index){
-      if (this.currentSongId === item.id) { // 当前播放是选中的歌曲
-        return 'start-icon';
-      }else{
-        return 'pause-icon';
-      }
+    // activePlayItem:function(item,index){
+    //   if (this.currentSongId === item.id) { // 当前播放是选中的歌曲
+    //     return 'start-icon';
+    //   }else{
+    //     return 'pause-icon';
+    //   }
+    // },
+    activePlayItem:function(index,event){
+      this.current=index;
     },
     formatTime(time){
       let it = parseInt(time)
@@ -279,9 +319,10 @@ export default {
 .creative-search
   width:100%
   height:454px
-  background:#e6e3e2
   margin-top: 61px
   position:relative
+  background:#e6e3e2 url('../../assets/images/banner.png') center no-repeat
+  background-size:100%
   .search-input
     width:719px
     height:48px

@@ -72,6 +72,7 @@
       <el-button>取消</el-button>
       <el-button type="danger" @click="formSubmit">确认</el-button>
     </div>
+    <audio ref="music" :src="musicData"></audio>
   </div>
 </template>
 
@@ -86,40 +87,50 @@ export default {
       lyricist:'',
       composer:'',
       textarea:'',
-      checked: false
+      checked: false,
+      musicData:'',
+      accompanyData:'',
+      mvData:'',
+      ktvData:'',
     }
   },
   methods:{
     //歌曲
     beforeUpload(file){
+      let that = this;
       let data = new FormData();
       data.append('file',file);//传文件
       axios.post('/api_config/api/upload/ktv?type=2',data).then(function(res){
         console.log(res.data.data);
+        that.musicData = res.data.data;
       })
     },
     //伴奏
     accompanyUpload(file){
+      let that = this;
       let data = new FormData();
       data.append('file',file);//传文件
       axios.post('/api_config/api/upload/ktv?type=1',data).then(function(res){
         console.log(res.data.data);
+        that.accompanyData = res.data.data;
       })
     },
     //MV
     uploadMV(file){
+      let that = this;
       let data = new FormData();
       data.append('file',file);//传文件
       axios.post('/api_config/api/upload/ktv?type=4',data).then(function(res){
-        console.log(res.data.data);
+        that.mvData = res.data.data;
       })
     },
     //KTV
     uploadKTV(file){
+      let that = this;
       let data = new FormData();
       data.append('file',file);//传文件
       axios.post('/api_config/api/upload/ktv?type=5',data).then(function(res){
-        console.log(res.data.data);
+        that.ktvData = res.data.data;
       })
     },
     // 提交KTV信息
@@ -144,30 +155,35 @@ export default {
         this.$message.error('歌词不能为空');
         return;
       }
-      // if (this.originalFile == '') {
-      //   this.$message.error('歌曲文件不能为空');
-      //   return;
-      // }
-      // if (this.accompanimentFile == '') {
-      //   this.$message.error('伴奏文件不能为空');
-      //   return;
-      // }
+      if (this.musicData == '') {
+        this.$message.error('歌曲文件不能为空');
+        return;
+      }
+      if (this.accompanyData == '') {
+        this.$message.error('伴奏文件不能为空');
+        return;
+      }
       if (this.checked == false) {
         this.$message.error('请阅读同意授权协议，比勾选');
         return;
       }
+      let that = this;
       axios.post('/api_config/api/ktv/sureSave',{
         name:this.songName, //ktv歌曲名称
         singer:this.singerName, //演唱者
         composer:this.composer, //作曲者
         author:this.lyricist, //作词者
         lyric:this.textarea, //歌词
-        originalFile:'1', //歌曲文件
-        accompanimentFile:'1', //伴奏文件
-        ktvFile:'', //ktv文件
-        mvFile:'' //mv文件
+        originalFile:this.musicData, //歌曲文件
+        accompanimentFile:this.accompanyData, //伴奏文件
+        ktvFile:this.ktvData, //ktv文件
+        mvFile:this.mvData, //mv文件
+        duration:this.$refs.music.duration
       }).then(function(res){
-        console.log(res.data.data);
+        if (res.data.code == 1) {
+          that.$message.success(res.data.msg);
+          // window.location.reload();
+        }
       })
     }
   }
@@ -199,6 +215,11 @@ export default {
   width:100%
 .conKTV .agreement
   margin-top:10px
+.conKTV .agreement >>> .el-checkbox__input.is-checked .el-checkbox__inner
+  background-color: #c20c0c
+  border-color: #c20c0c
+.conKTV .agreement >>>  .el-checkbox__input.is-checked+.el-checkbox__label
+  color: #c20c0c
 .content .btn-box
   width:100%
   text-align:center

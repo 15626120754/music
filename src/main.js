@@ -4,6 +4,7 @@ import router from './router'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
+import VueLazyload from 'vue-lazyload'
 import qs from 'qs'
 import store from './vuex/store'
 import Home from '@/components/index'
@@ -15,6 +16,7 @@ Vue.config.productionTip = false
 Vue.use(VueAwesomeSwiper)
 Vue.use(VueResource)
 Vue.use(ElementUI)
+Vue.use(VueLazyload)
 
 // Vue.http.options.emulateJSON = true;
 // Vue.http.options.headers = {

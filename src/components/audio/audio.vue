@@ -6,11 +6,11 @@
         <div class="player-works">
           <p class="player-works-cover">
             <span class="ui-image" style="width: 50px; height: 50px; border-radius: 2px;">
-              <img src="../../assets/images/74efcd23dd797457e03a9962ed3e6d5c.jpg_50x50.jpg">
+              <img :src="myCoverImage" style="width: 100%">
             </span>
           </p>
-          <p class="player-works-title">失落街角（Meu Coração）</p>
-          <p class="player-works-text">司徒嘉伟</p>
+          <p class="player-works-title">{{music_name}}</p>
+          <p class="player-works-text">{{mySinger}}</p>
         </div>
         <div class="player-progress">
           <div class="player-progress-top">
@@ -60,7 +60,9 @@ export default {
   name: 'IndexAudio',
   props:{
     music_audio:String,
-    music_name:String
+    music_name:String,
+    mySinger:String,
+    myCoverImage:String
   },
   data () {
     return {
@@ -194,7 +196,7 @@ export default {
         -moz-text-overflow: ellipsis
         text-overflow: ellipsis
         white-space: nowrap
-        background-image: url('../../assets/images/none-image.png')
+        background-image: url('../../assets/images/74efcd23dd797457e03a9962ed3e6d5c.jpg_50x50.jpg')
         background-position: 0 0
         background-repeat: no-repeat
         background-size: 100% 100%

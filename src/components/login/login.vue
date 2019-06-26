@@ -41,7 +41,7 @@ export default {
       }
     }
   },
-   methods:{
+  methods:{
     //用户登录
     submitForm(formName){
       this.$refs[formName].validate((valid) => {
@@ -67,6 +67,7 @@ export default {
               // this.$store.dispatch('setUserId',response.data.data.userId);
               // console.log(this.$store.state.isLogin);
               // console.log(this.$store.state.currentUser);
+              // this.$nextTick(() => (location.reload()))
             }else{
               this.$message.error(response.data.msg);
             }

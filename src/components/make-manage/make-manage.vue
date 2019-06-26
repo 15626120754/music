@@ -20,13 +20,13 @@
           <ul class="clearfix">
             <li  v-for="(item,index) in items" :class="{active:index==nowIndex}" @click="tab(item,index)">{{item.name}}</li>
           </ul>
-          <div class="settledIn">入驻KTV</div>
-        </div>
-        <div class="list" v-show="showFlag">
-          <ktv-template></ktv-template>
+          <!-- <div class="settledIn">入驻KTV</div> -->
         </div>
         <div class="list" v-show="!showFlag">
-          2
+          <ktv-template></ktv-template>
+        </div>
+        <div class="list" v-show="showFlag">
+          <ktv-settled></ktv-settled>
         </div>
     </div>
   </div>
@@ -39,21 +39,23 @@ import IndexHeader from '../header/header'
 import IndexFooter from '../footer/footer'
 import IndexAudio from '../audio/audio'
 import KtvTemplate from '../ktv-template/ktv-template'
+import KtvSettled from '../ktv-settled/ktv-settled'
 export default {
   name: 'MakeManage',
   components:{
   	IndexHeader,
     IndexFooter,
     IndexAudio,
-    KtvTemplate
+    KtvTemplate,
+    KtvSettled
   },
   data () {
     return {
       audioShow:false,
       showFlag:true,
-      nowIndex:1,
+      nowIndex:0,
       items: [
-          {name:'MV制作',istrue:true},
+          {name:'入驻KTV',istrue:true},
           {name:'KTV制作',istrue:false}
       ]
     }

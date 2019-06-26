@@ -141,6 +141,7 @@ export default {
         		sessionStorage.clear();//清除sessionStorage
                 this.$message({type: 'success',message: '退出成功'});
                 this.$store.dispatch('setUser',null);
+                this.$nextTick(() => (location.reload()))
 		    },(response) => {
 		        console.log(response)
 		    })
