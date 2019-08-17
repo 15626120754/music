@@ -4,9 +4,11 @@
     <div class="wrapper">
 	    <swiper :options="swiperOption">
 	      <swiper-slide class="swiper-slide" v-for="item of carouselData" :key="item.id" :style="{background:item.backgroundColor}">
-	        <a :href="item.url" class="slide-img" :style="{backgroundImage:'url(' + item.coverImage + ')',backgroundRepeat:'no-repeat', backgroundPosition:'center center', backgroundSize: '100%'}"></a>
+	        <a :href="item.url" class="slide-img" :style="{backgroundImage:'url(' + item.coverImage + ')',backgroundRepeat:'no-repeat', backgroundPosition:'center center', backgroundSize: cover}"></a>
 	      </swiper-slide>
 	      <div class="swiper-pagination"  slot="pagination"></div>
+        <div class="swiper-button-prev swiper-button-white"></div>
+        <div class="swiper-button-next swiper-button-white"></div>
 	    </swiper>
   	</div>
     <transition name="fade">
@@ -186,12 +188,16 @@ export default {
 	      el: '.swiper-pagination',
 	      clickable:true
 	    },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
         spaceBetween: 100,
         effect: 'fade',
         autoplay: {
-    	　　　delay:5000,
+    	　　delay:5000,
     		　disableOnInteraction: true
-    	　　}
+    	　}
       },
       carouselData:[],
       cooperativeData:[],
@@ -232,6 +238,10 @@ export default {
     opacity: 0
   .wrapper >>> .swiper-pagination-bullet-active
     background-color: #C20C0C
+  .wrapper >>> .swiper-button-prev 
+    margin-left:2%
+  .wrapper >>> .swiper-button-next
+    margin-right:2%
   .wrapper
     overflow: hidden
     width: 100%
@@ -242,7 +252,7 @@ export default {
       text-align:center
     .swiper-slide a
       display:block
-      width:1200px
+      width:100%
       height:445px
       margin:0 auto
   .discover-module-main .list
